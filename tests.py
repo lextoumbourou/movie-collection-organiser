@@ -31,14 +31,16 @@ class testCleanup(unittest.TestCase):
     def ensureDirectoryExists(self):
         self.assertTrue(os.path.exists(self.path+"Taxi Driver (1976)"))
 
-    #def tearDown(self):
-    #    # Delete test folder
-    #    for file in glob.glob(self.path+"*"):
-    #        try:
-    #            os.remove(file)
-    #        except:
-    #            os.rmdir(file)
-    #    os.rmdir(self.path)
+    def tearDown(self):
+        # Delete test folder
+        for file in glob.glob(self.path+"*"):
+            try:
+                os.remove(file)
+            except OSError:
+                for f in glob.glob(file+"/*"):
+                    os.remove(f)
+                os.rmdir(file)
+        os.rmdir(self.path)
 
 if __name__ == "__main__":
     unittest.main()

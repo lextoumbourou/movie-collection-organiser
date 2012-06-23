@@ -1,11 +1,6 @@
 """
-Problems to solve
-1. Ensure all Movies sit inside a directory which has the same name as the Movie Name.avi movie
-2. Ensure all directories are called Movie Name (YYYY) 
-3. Ensure each directory has 4 files
-    1. Movie Name.avi
-    2. Movie Name-fanart.jpg
-    3. 
+Movie Collection Organiser
+
 Author: Lex Toumbourou
 """
 import os
@@ -72,14 +67,11 @@ def get_year(movie_name, try_count=2):
         return get_year(" ".join(movie_name), try_count-1)
 
 def move_related_files(path, movie_file, new_dir):
-    print path
-    print movie_file
-    print new_dir
     for file in glob.glob(path+"/"+movie_file+"*"):
-        print "First file, ", file
+        if os.path.isdir(file):
+            continue
         base_file = os.path.basename(file)
-        print path+"/"+base_file, new_dir+"/"+base_file
-        move(path+"/"+base_file, new_dir+"/"+base_file)
+        move(path+"/"+base_file, path+"/"+new_dir+"/"+base_file)
 
 def update_all_files(path):
     if not os.path.isdir(path):
@@ -88,17 +80,17 @@ def update_all_files(path):
 
     # Find all the videos not in a sub directory
     for file in glob.glob(path+"/*.avi"):
-        # See if a directory already exists for it
-        # if so, just move all the files into it
-        if os.path.isdir(file):
-            move_related_files(file)
-            continue
-
         file_name = os.path.basename(file)
         movie_file, extension = os.path.splitext(file_name)
 
+        # See if a directory already exists for it
+        # if so, just move all the files into it
+        if os.path.isdir(file):
+            continue
+
+        movie_name = clean_movie_name(movie_file)
+
         if not has_year_in_brackets(movie_file):
-            movie_name = clean_movie_name(movie_file)
             name, year = get_year(movie_name)
 
             if year:
@@ -108,13 +100,16 @@ def update_all_files(path):
         else:
             new_dir = "{0}".format(movie_name)
 
-        print "Attempting to create ", new_dir
-        try:
-            os.makedirs(path+new_dir)
-        except OSError:
-            pass
-        move_related_files(path, movie_file, new_dir)
+        if new_dir:
+            print "Attempting to create ", new_dir
+            try:
+                os.makedirs(path+new_dir)
+            except OSError:
+                pass
+            move_related_files(path, movie_file, new_dir)
+        else:
+            print "You'll have to fix {0} yourself.".format(file_name)
 
 if __name__ == "__main__":
-    movie_path = "/media/tbmedia/Media/Movies"
+    movie_path = "/media/tbmedia/Media/Movies/"
     update_all_files(movie_path)
