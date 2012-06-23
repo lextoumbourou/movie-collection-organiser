@@ -13,10 +13,6 @@ import secret
 from shutil import move
 from sys import exit
 
-def has_space_word_separator(file_name):
-    pass
-    #if re.search(u"")
-
 def has_year_in_brackets(movie_name):
     # Ensure file name includes year in format (YYYY).avi
     if re.search(u"(\w+ )+\(\d{4}\)", movie_name):
